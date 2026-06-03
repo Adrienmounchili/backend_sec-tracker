@@ -1,4 +1,4 @@
-# sec-tracker — Backend Python
+# sec-tracker — Backend node
 
 ## Structure des fichiers
 ```
