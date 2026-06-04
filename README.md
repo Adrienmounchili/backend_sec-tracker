@@ -1,9 +1,3 @@
-# sec-tracker — Backend node
+# sec-tracker — Backend Python
 
-## Structure des fichiers
-```
-cyberscan-backend-python/
-├── server.js         ← Le backend complet (tout est ici)
-├── package.json       
-├── .env.example       ← Modèle des variables d'environnement
-└── .gitignore         ← Fichiers à ne pas mettre sur GitHub
+Startup de sacn de vulnerabilites des ssites web des autres entreprises
