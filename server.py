@@ -691,24 +691,29 @@ def score_to_grade(score):
 
 
 def verify_token(request):
-    """Vérifie le token JWT Supabase dans le header Authorization"""
     auth_header = request.headers.get("Authorization", "")
     if not auth_header.startswith("Bearer "):
         return {"valid": False}
-    token = auth_header.replace("Bearer ", "")
+    token = auth_header.replace("Bearer ", "").strip()
     try:
-        user = supabase.auth.get_user(token)
-        if user and user.user:
-            # Vérifier si c'est un admin Sec-Tracker
-            profile = supabase.table("profiles") \
-                .select("role") \
-                .eq("id", user.user.id) \
-                .single() \
-                .execute()
-            is_admin = profile.data.get("role") == "admin" if profile.data else False
-            return {"valid": True, "user_id": user.user.id, "is_admin": is_admin}
-    except Exception:
-        pass
+        # Vérifier le token via l'API REST Supabase
+        resp = requests.get(
+            f"{os.environ['SUPABASE_URL']}/auth/v1/user",
+            headers={
+                "Authorization": f"Bearer {token}",
+                "apikey": os.environ["SUPABASE_SERVICE_KEY"]
+            },
+            timeout=10
+        )
+        if resp.status_code == 200:
+            user_data = resp.json()
+            return {
+                "valid": True,
+                "user_id": user_data.get("id"),
+                "is_admin": True
+            }
+    except Exception as e:
+        print(f"Token error: {e}")
     return {"valid": False}
 
 
@@ -717,5 +722,5 @@ def verify_token(request):
 # ================================================================
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 3001))
-    print(f"\n🚀 Sec-Tracker Backend Flask démarré sur le port {port}")
+    print(f"\n Sec-Tracker Backend Flask démarré sur le port {port}")
     app.run(host="0.0.0.0", port=port, debug=False)
